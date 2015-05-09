@@ -4,6 +4,7 @@ define(function (require) {
     var FieldFormat = Private(require('components/index_patterns/_field_format/FieldFormat'));
     var BoundToConfigObj = Private(require('components/bound_to_config_obj'));
     var moment = require('moment');
+    require('moment-timezone');
 
     require('components/field_format_editor/pattern/pattern');
 
@@ -17,7 +18,8 @@ define(function (require) {
     DateTime.fieldType = 'date';
 
     DateTime.paramDefaults = new BoundToConfigObj({
-      pattern: '=dateFormat'
+      pattern: '=dateFormat',
+      tz: '=dateFormat:tz'
     });
 
     DateTime.editor = {
@@ -41,12 +43,18 @@ define(function (require) {
       // don't give away our ref to converter so
       // we can hot-swap when config changes
       var pattern = this.param('pattern');
+      var tz = this.param('tz');
 
       if (this._memoizedPattern !== pattern) {
         this._memoizedPattern = pattern;
         this._memoizedConverter = _.memoize(function converter(val) {
           return moment(val).format(pattern);
         });
+      }
+      if (this._tz !== tz) {
+        this._tz = tz;
+        moment.tz.setDefault(tz);
+        this._memoizedConverter.cache.clear();
       }
       return this._memoizedConverter(val);
     };

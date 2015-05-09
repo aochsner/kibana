@@ -1,4 +1,7 @@
-define(function () {
+define(function (require) {
+  var _ = require('lodash');
+  var moment = require('moment');
+  require('moment-timezone');
   return function configDefaultsProvider() {
     // wraped in provider so that a new instance is given to each app/test
 
@@ -11,6 +14,12 @@ define(function () {
       'dateFormat': {
         value: 'MMMM Do YYYY, HH:mm:ss.SSS',
         description: 'When displaying a pretty formatted date, use this format',
+      },
+      'dateFormat:tz': {
+        value: 'Default',
+        description: 'Which timezone should be used',
+        type: 'select',
+        options: _.union(['Default'], moment.tz.names())
       },
       'dateFormat:scaled': {
         type: 'json',
